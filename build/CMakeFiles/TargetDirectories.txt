@@ -1,0 +1,4 @@
+C:/Users/leonp/Documents/HTW/MGPU/mgpu-sobel/build/CMakeFiles/mgpu_sobel.dir
+C:/Users/leonp/Documents/HTW/MGPU/mgpu-sobel/build/CMakeFiles/mgpu_sobel_app.dir
+C:/Users/leonp/Documents/HTW/MGPU/mgpu-sobel/build/CMakeFiles/edit_cache.dir
+C:/Users/leonp/Documents/HTW/MGPU/mgpu-sobel/build/CMakeFiles/rebuild_cache.dir
