@@ -1,8 +1,10 @@
 #include "io/depth_io.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <fstream>
+#include <limits>
 #include <string>
 
 #include "core/error.hpp"
@@ -123,6 +125,53 @@ Status save_depth(const std::string& path, const DepthMap& depth) {
         out.write(reinterpret_cast<const char*>(row),
                   static_cast<std::streamsize>(depth.size.width * sizeof(float)));
     }
+    return ok();
+}
+
+Status normalize_depth(DepthMap& depth) {
+    if (depth.size.width <= 0 || depth.size.height <= 0) {
+        return error(ErrorCode::InvalidArgument, "Ungueltige Bildgroesse");
+    }
+    if (depth.stride < depth.size.width) {
+        return error(ErrorCode::InvalidArgument, "Ungueltiger Depth-Stride");
+    }
+    if (depth.data.size() < static_cast<size_t>(depth.stride * depth.size.height)) {
+        return error(ErrorCode::InvalidArgument, "Depth-Daten zu klein");
+    }
+
+    float min_v = std::numeric_limits<float>::infinity();
+    float max_v = -std::numeric_limits<float>::infinity();
+    bool has_valid = false;
+
+    for (float v : depth.data) {
+        if (!std::isfinite(v)) {
+            continue;
+        }
+        min_v = std::min(min_v, v);
+        max_v = std::max(max_v, v);
+        has_valid = true;
+    }
+
+    if (!has_valid) {
+        std::fill(depth.data.begin(), depth.data.end(), 0.0f);
+        return ok();
+    }
+
+    const float range = max_v - min_v;
+    if (range <= 1e-12f) {
+        std::fill(depth.data.begin(), depth.data.end(), 0.0f);
+        return ok();
+    }
+
+    // Auf [0,255] normieren, damit Sobel-Gradienten nicht numerisch untergehen.
+    for (float& v : depth.data) {
+        if (!std::isfinite(v)) {
+            v = 0.0f;
+            continue;
+        }
+        v = ((v - min_v) / range) * 255.0f;
+    }
+
     return ok();
 }
 

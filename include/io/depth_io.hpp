@@ -10,5 +10,6 @@ namespace mgpu {
 // Laden/Speichern von DepthMaps.
 Status load_depth(const std::string& path, DepthMap& depth);
 Status save_depth(const std::string& path, const DepthMap& depth);
+Status normalize_depth(DepthMap& depth);
 
 } // namespace mgpu

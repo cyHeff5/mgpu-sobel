@@ -42,6 +42,10 @@ Status BenchmarkRunner::run(const AppConfig& config,
         if (!st.ok) {
             return st;
         }
+        const Status norm_st = normalize_depth(depth_in);
+        if (!norm_st.ok) {
+            return norm_st;
+        }
     } else if (config.input_type == InputType::Gray) {
         const Status st = load_gray(input_path, gray_in);
         if (!st.ok) {
