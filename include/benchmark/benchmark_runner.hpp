@@ -11,7 +11,12 @@ namespace mgpu {
 // Ergebnis eines einzelnen Backend-Laufs.
 struct BenchmarkResult {
     std::string backend_name;
-    double time_ms = 0.0;
+    double mean_ms = 0.0;
+    double min_ms = 0.0;
+    double max_ms = 0.0;
+    double stddev_ms = 0.0;
+    int warmup_runs = 0;
+    int measured_runs = 0;
 };
 
 // Fuehrt wiederholbare Benchmarks fuer mehrere Backends aus.
