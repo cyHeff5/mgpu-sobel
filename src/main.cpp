@@ -21,13 +21,24 @@ void print_usage() {
               << "               [--benchmark]\n";
 }
 
-Backend parse_backend(const std::string& value) {
-    if (value == "cpu") return Backend::Cpu;
-    if (value == "omp") return Backend::Omp;
-    if (value == "cuda_naive") return Backend::CudaNaive;
-    if (value == "cuda_tiled") return Backend::CudaTiled;
-    // Fallback fuer unbekannte Werte (aktuell ohne Hard-Error).
-    return Backend::Cpu;
+bool parse_backend(const std::string& value, Backend& backend) {
+    if (value == "cpu") {
+        backend = Backend::Cpu;
+        return true;
+    }
+    if (value == "omp") {
+        backend = Backend::Omp;
+        return true;
+    }
+    if (value == "cuda_naive") {
+        backend = Backend::CudaNaive;
+        return true;
+    }
+    if (value == "cuda_tiled") {
+        backend = Backend::CudaTiled;
+        return true;
+    }
+    return false;
 }
 
 InputType parse_input_type(const std::string& value) {
@@ -72,7 +83,12 @@ int main(int argc, char** argv) {
         } else if (arg == "--output" && i + 1 < argc) {
             output_path = argv[++i];
         } else if (arg == "--backend" && i + 1 < argc) {
-            config.backend = parse_backend(argv[++i]);
+            const std::string backend_arg = argv[++i];
+            if (!parse_backend(backend_arg, config.backend)) {
+                std::cerr << "Unbekanntes Backend: " << backend_arg << "\n";
+                print_usage();
+                return 1;
+            }
         } else if (arg == "--input-type" && i + 1 < argc) {
             config.input_type = parse_input_type(argv[++i]);
         } else if (arg == "--benchmark-warmup" && i + 1 < argc) {
